@@ -2,7 +2,7 @@
 import re,os
 import urllib.request
 
-url = input("請輸入網頁")
+url = input("請輸入網頁:")
 #url = "https://nhentai.net/g/183710/"
 
 webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
@@ -20,12 +20,25 @@ for i in range(len(image_url)):
     image_url[i] = "https:" + image_url[i] + ".jpg"
 
 #建立一個資料夾
-if not os.path.exists(dir_name):
-    os.mkdir(dir_name)
+try:
+    if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
+except OSError as e:
+    while True:
+        print("無法順利建立資料夾，請重新命名")
+        dir_name = input("請輸入資料夾名稱:")
+        try:
+            os.mkdir(dir_name)
+        except:
+            continue
+        else:
+            break
+
 
 #接下來可以下載圖片
 for i in range(10000):
     try:
+        print("正在下載圖片{0}.jpg".format(i + 1))
         web_image = urllib.request.urlretrieve(image_url[i],"{0}/{1}.jpg".format(dir_name,i+1))
     except:
         break
