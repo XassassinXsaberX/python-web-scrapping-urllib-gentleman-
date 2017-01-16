@@ -14,11 +14,23 @@ def find_dir_title(url,html):#從網頁原始碼中找尋標題
 
 def find_image_url(url,html):#從main網頁中找尋圖片url
     if "nhentai" in url:
-        image_url = re.findall(r'<img src=".+?.jpg" width', html)
+        image_url = re.findall(r'(<img src=".+?.(jpg|png|gif))" width', html)
+        lt = [0]*len(image_url)
+        for i in range(len(image_url)):
+            lt[i] = image_url[i][0]
+        image_url = lt
         for i in range(len(image_url)):
             image_url[i] = image_url[i].split('<img src="')[1]
-            image_url[i] = image_url[i].split('t.jpg" width')[0]
-            image_url[i] = "https:" + image_url[i] + ".jpg"
+            if 'jpg' in image_url[i]:
+                image_url[i] = image_url[i].split('t.jpg')[0]
+                image_url[i] = "https:" + image_url[i] + ".jpg"
+            elif 'png' in image_url[i]:
+                image_url[i] = image_url[i].split('t.png')[0]
+                image_url[i] = "https:" + image_url[i] + ".png"
+            else:
+                image_url[i] = image_url[i].split('t.gif')[0]
+                image_url[i] = "https:" + image_url[i] + ".gif"
+
         return image_url #回傳一個list，其中每一個元素都是圖片的url
     elif "wnacg" in url:
         #找取圖片的名稱
@@ -82,10 +94,10 @@ def downloader(i, dir_name, url,count,total,lock):
         print("已下載{0}/{1}張圖".format(count[0],total))
 
 url = input("請輸入網頁")
-#url = "https://nhentai.net/g/183710/"
+#url = "https://nhentai.net/g/128414/"
 #url = "http://www.wnacg.com/photos-index-aid-35197.html"
 #url = "http://www.wnacg.com/photos-index-aid-35188.html"
-#url = "http://www.wnacg.com/photos-index-page-1-aid-35193.html"
+#url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
 
 
 #建立連線並下載網頁原始碼
