@@ -105,12 +105,12 @@ def downloader(i, dir_name, url,count,total,lock):
 
 if __name__ == "__main__":
     try:
-        #url = input("請輸入網頁")
+        url = input("請輸入網頁")
         #url = "https://nhentai.net/g/128414/"
         #url = "http://www.wnacg.com/photos-index-aid-35197.html"
         #url = "http://www.wnacg.com/photos-index-aid-35188.html"
         #url = 'https://nhentai.net/g/128414/'
-        url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
+        #url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
 
         #建立連線並下載網頁原始碼
         webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
