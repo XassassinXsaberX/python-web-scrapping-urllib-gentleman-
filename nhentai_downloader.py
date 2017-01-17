@@ -86,10 +86,19 @@ def find_image_url(url,html):#從main網頁中找尋圖片url
         return image_url
 
 def downloader(i, dir_name, url,count,total,lock):
-
-    urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))
+    type = 0
+    try:
+        urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))
+    except:
+        url = url[:-3]
+        url += 'png'
+        urllib.request.urlretrieve(url, "{0}\{1}.png".format(dir_name, i))
+        type = 1
     with lock:
-        print("圖片{0}.jpg 已下載完成".format(i),end=" ")
+        if type == 0 :
+            print("圖片{0}.jpg 已下載完成".format(i),end=" ")
+        else:
+            print("圖片{0}.png 已下載完成".format(i), end=" ")
         count[0] += 1
         print("已下載{0}/{1}張圖".format(count[0],total))
 
@@ -100,12 +109,8 @@ if __name__ == "__main__":
         #url = "https://nhentai.net/g/128414/"
         #url = "http://www.wnacg.com/photos-index-aid-35197.html"
         #url = "http://www.wnacg.com/photos-index-aid-35188.html"
-        url = 'https://nhentai.net/g/128414/'
-        #url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
-
-
-
-
+        #url = 'https://nhentai.net/g/128414/'
+        url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
 
         #建立連線並下載網頁原始碼
         webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
