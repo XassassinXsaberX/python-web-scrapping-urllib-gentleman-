@@ -93,61 +93,75 @@ def downloader(i, dir_name, url,count,total,lock):
         count[0] += 1
         print("已下載{0}/{1}張圖".format(count[0],total))
 
-url = input("請輸入網頁")
-#url = "https://nhentai.net/g/128414/"
-#url = "http://www.wnacg.com/photos-index-aid-35197.html"
-#url = "http://www.wnacg.com/photos-index-aid-35188.html"
-#url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
 
-
-#建立連線並下載網頁原始碼
-webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
-req = urllib.request.Request(url=url, headers=webheader)
-webpage = urllib.request.urlopen(req)
-html = webpage.read().decode("utf-8")
-
-#從網頁原始碼中尋找標題
-dir_name = find_dir_title(url,html)
-
-#獲取一個list，其中的元素為圖片的url
-image_url = find_image_url(url,html)
-
-#建立一個資料夾
-try:
-    if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
-except OSError as e:
-    while True:
-        print("無法順利建立資料夾:{}，請重新命名".format(dir_name))
-        dir_name = input("請輸入資料夾名稱:")
-        try:
-            os.mkdir(dir_name)
-        except:
-            continue
-        else:
-            break
-
-
-
-#接下來可以下載圖片
-print("開始下載圖片...")
-thread = [0]*len(image_url)
-lock = threading.Lock()
-count = [0]
-for i in range(len(image_url)):
+if __name__ == "__main__":
     try:
-        #print("正在下載圖片{0}.jpg".format(i + 1))
-        #web_image = urllib.request.urlretrieve(image_url[i],"{0}/{1}.jpg".format(dir_name,i+1))
-        for j in range(-1,-100,-1):
-            if image_url[i][j] == '/':
-                name = image_url[i][j+1:-4]
+        #url = input("請輸入網頁")
+        #url = "https://nhentai.net/g/128414/"
+        #url = "http://www.wnacg.com/photos-index-aid-35197.html"
+        #url = "http://www.wnacg.com/photos-index-aid-35188.html"
+        url = 'https://nhentai.net/g/128414/'
+        #url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
+
+
+
+
+
+        #建立連線並下載網頁原始碼
+        webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
+        req = urllib.request.Request(url=url, headers=webheader)
+        webpage = urllib.request.urlopen(req)
+        html = webpage.read().decode("utf-8")
+
+        #從網頁原始碼中尋找標題
+        dir_name = find_dir_title(url,html)
+
+        #獲取一個list，其中的元素為圖片的url
+        image_url = find_image_url(url,html)
+
+        #建立一個資料夾
+        try:
+            if not os.path.exists(dir_name):
+                os.mkdir(dir_name)
+        except OSError as e:
+            while True:
+                print("無法順利建立資料夾:{}，請重新命名".format(dir_name))
+                dir_name = input("請輸入資料夾名稱:")
+                try:
+                    os.mkdir(dir_name)
+                except:
+                    continue
+                else:
+                    break
+
+
+
+        #接下來可以下載圖片
+        print("開始下載圖片...")
+        thread = [0]*len(image_url)
+        lock = threading.Lock()
+        count = [0]
+        for i in range(len(image_url)):
+            try:
+                #print("正在下載圖片{0}.jpg".format(i + 1))
+                #web_image = urllib.request.urlretrieve(image_url[i],"{0}/{1}.jpg".format(dir_name,i+1))
+                for j in range(-1,-100,-1):
+                    if image_url[i][j] == '/':
+                        name = image_url[i][j+1:-4]
+                        break
+                thread[i] = threading.Thread(target=downloader,args=(name,dir_name,image_url[i],count,len(image_url),lock))
+                thread[i].start()
+            except:
                 break
-        thread[i] = threading.Thread(target=downloader,args=(name,dir_name,image_url[i],count,len(image_url),lock))
-        thread[i].start()
-    except:
-        break
-print("total",len(thread))
-count = 0
+        print("total",len(thread))
+        for i in range(len(image_url)):
+            thread[i].join(1)
+        input("下載完成")
+        count = 0
+    except BaseException as e:
+        print("請將此python設為預設開啟程式才能執行，不能用右鍵->開啟檔案->python執行")
+        input()
+
 
 
 
