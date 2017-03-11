@@ -72,8 +72,8 @@ def find_image_url(url,html):#從main網頁中找尋圖片url
         html = web.read().decode("utf-8")
 
         #接下來可以從此html原始碼中找真正要抓的圖片url了
-        image_url = re.findall(r'src="/data.+?\.jpg',html)
-        image_url = image_url[0].split("src=\"")[1]
+        image_url = re.findall(r'(src="/data.+?\.(jpg|png|gif))',html)
+        image_url = image_url[0][0].split("src=\"")[1]
         for i in range(-1,-100,-1):
             if image_url[i] == '/':
                 image_url = image_url[0:i+1]
@@ -106,11 +106,7 @@ def downloader(i, dir_name, url,count,total,lock):
 if __name__ == "__main__":
     try:
         url = input("請輸入網頁")
-        #url = "https://nhentai.net/g/128414/"
-        #url = "http://www.wnacg.com/photos-index-aid-35197.html"
-        #url = "http://www.wnacg.com/photos-index-aid-35188.html"
-        #url = 'https://nhentai.net/g/128414/'
-        #url = "http://www.wnacg.com/photos-index-aid-21037.html"           #bug need to fix
+        #url = 'http://www.wnacg.com/photos-index-aid-36963.html'
 
         #建立連線並下載網頁原始碼
         webheader = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0' }
@@ -129,6 +125,10 @@ if __name__ == "__main__":
             if not os.path.exists(dir_name):
                 os.mkdir(dir_name)
         except OSError as e:
+            #加入以下這兩行是因為 控制台不支援utf-8編碼....  如果你是用pycharm來執行程式，則這兩行可以註解掉
+            dir_name = dir_name.encode('cp950', 'replace')
+            dir_name = dir_name.decode('cp950')
+            #
             while True:
                 print("無法順利建立資料夾:{}，請重新命名".format(dir_name))
                 dir_name = input("請輸入資料夾名稱:")
