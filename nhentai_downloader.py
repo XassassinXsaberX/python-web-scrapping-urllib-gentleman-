@@ -1,6 +1,7 @@
 #coding="utf-8"
 import re,os,threading
 import urllib.request
+import requests
 
 def find_dir_title(url,html):#從網頁原始碼中找尋標題
     if "nhentai" in url:
@@ -21,15 +22,17 @@ def find_image_url(url,html):#從main網頁中找尋圖片url
         image_url = lt
         for i in range(len(image_url)):
             image_url[i] = image_url[i].split('<img src="')[1]
-            if 'jpg' in image_url[i]:
+            if 't.jpg' in image_url[i]:
                 image_url[i] = image_url[i].split('t.jpg')[0]
-                image_url[i] = "https:" + image_url[i] + ".jpg"
-            elif 'png' in image_url[i]:
+                image_url[i] = image_url[i] + ".jpg"
+            elif 't.png' in image_url[i]:
                 image_url[i] = image_url[i].split('t.png')[0]
-                image_url[i] = "https:" + image_url[i] + ".png"
-            else:
+                image_url[i] = image_url[i] + ".png"
+            elif 't.gif' in image_url[i]:
                 image_url[i] = image_url[i].split('t.gif')[0]
-                image_url[i] = "https:" + image_url[i] + ".gif"
+                image_url[i] = image_url[i] + ".gif"
+            image_url[i] = image_url[i][0:8] + 'i' + image_url[i][9:]
+
 
         return image_url #回傳一個list，其中每一個元素都是圖片的url
     elif "wnacg" in url:
@@ -88,7 +91,10 @@ def find_image_url(url,html):#從main網頁中找尋圖片url
 def downloader(i, dir_name, url,count,total,lock):
     type = 0
     try:
-        urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))
+        #urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))  #以下兩中寫法皆可
+        r = requests.get(url)
+        with open('{0}\{1}.jpg'.format(dir_name,i),"wb") as f:
+            f.write(r.content)
     except:
         url = url[:-3]
         url += 'png'
@@ -107,7 +113,7 @@ if __name__ == "__main__":
     try:
         url = input("請輸入網頁")
 
-        #url = 'http://www.wnacg.com/photos-index-aid-36963.html'
+        #url = 'https://nhentai.net/g/190088/'
 
         #url = 'http://www.wnacg.com/photos-index-aid-36505.html'
 
