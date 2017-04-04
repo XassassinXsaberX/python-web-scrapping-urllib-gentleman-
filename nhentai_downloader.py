@@ -91,14 +91,21 @@ def find_image_url(url,html):#從main網頁中找尋圖片url
 def downloader(i, dir_name, url,count,total,lock):
     type = 0
     try:
-        #urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))  #以下兩中寫法皆可
+        #urllib.request.urlretrieve(url, "{0}\{1}.jpg".format(dir_name, i))  #以下兩中寫法皆可，建議用以下寫法
         r = requests.get(url)
+        if r.status_code == 404:
+            raise EOFError
         with open('{0}\{1}.jpg'.format(dir_name,i),"wb") as f:
             f.write(r.content)
     except:
         url = url[:-3]
         url += 'png'
-        urllib.request.urlretrieve(url, "{0}\{1}.png".format(dir_name, i))
+        #urllib.request.urlretrieve(url, "{0}\{1}.png".format(dir_name, i))
+        r = requests.get(url)
+        if r.status_code == 404:
+            raise EOFError
+        with open('{0}\{1}.jpg'.format(dir_name, i), "wb") as f:
+            f.write(r.content)
         type = 1
     with lock:
         if type == 0 :
@@ -113,7 +120,7 @@ if __name__ == "__main__":
     try:
         url = input("請輸入網頁")
 
-        #url = 'https://nhentai.net/g/190088/'
+        #url = 'http://www.wnacg.com/photos-index-aid-37432.html'
 
         #url = 'http://www.wnacg.com/photos-index-aid-36505.html'
 
