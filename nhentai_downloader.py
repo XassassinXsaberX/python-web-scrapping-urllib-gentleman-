@@ -1,4 +1,4 @@
-#coding="utf-8"
+﻿#coding="utf-8"
 import re,os,threading
 import urllib.request
 import requests
@@ -117,8 +117,10 @@ def downloader(i, dir_name, url,count,total,lock):
 
 
 if __name__ == "__main__":
+	#print("請輸入網頁")
     try:
-        url = input("請輸入網頁")
+        print("請輸入網頁")
+        url = input("")
 
         #url = 'http://www.wnacg.com/photos-index-aid-37432.html'
 
@@ -161,24 +163,43 @@ if __name__ == "__main__":
         #接下來可以下載圖片
         print("開始下載圖片...")
         thread = [0]*len(image_url)
+        print("total", len(thread))
         lock = threading.Lock()
         count = [0]
-        for i in range(len(image_url)):
-            try:
-                #print("正在下載圖片{0}.jpg".format(i + 1))
-                #web_image = urllib.request.urlretrieve(image_url[i],"{0}/{1}.jpg".format(dir_name,i+1))
-                for j in range(-1,-100,-1):
-                    if image_url[i][j] == '/':
-                        name = image_url[i][j+1:-4]
+
+        downloadLen = 50                          # 每次使用thread下載幾張圖片
+        downloadTime = int(len(thread) / downloadLen)  # 需要啟動幾次thread
+        if (len(thread) % downloadLen != 0):
+            downloadTime += 1
+
+        for k in range(downloadTime):
+            for i in range(downloadLen):
+                if k == downloadTime - 1:
+                    if k * downloadLen + i >= len(thread):
                         break
-                thread[i] = threading.Thread(target=downloader,args=(name,dir_name,image_url[i],count,len(image_url),lock))
-                thread[i].start()
-            except:
-                break
-        print("total",len(thread))
-        for i in range(len(image_url)):
-            thread[i].join(1)
-        input("下載完成")
+                try:
+                    #print("正在下載圖片{0}.jpg".format(i + 1))
+                    #web_image = urllib.request.urlretrieve(image_url[i],"{0}/{1}.jpg".format(dir_name,i+1))
+                    for j in range(-1,-100,-1):
+                        if image_url[k * downloadLen + i][j] == '/':
+                            name = image_url[k * downloadLen + i][j+1:-4]
+                            break
+                    thread[k * downloadLen + i] = threading.Thread(target=downloader,args=(name,dir_name,image_url[k * downloadLen + i],count,len(image_url),lock))
+                    thread[k * downloadLen + i].start()
+                except:
+                    break
+
+            for i in range(downloadLen):
+                if k == downloadTime - 1:
+                    if k * downloadLen + i >= len(thread):
+                        break
+                thread[k * downloadLen + i].join(1)
+
+
+        #print("total",len(thread))
+        #for i in range(len(image_url)):
+        #    thread[i].join(1)
+        print("下載完成")
         count = 0
     except BaseException as e:
         print("請將此python設為預設開啟程式才能執行，不能用右鍵->開啟檔案->python執行")
